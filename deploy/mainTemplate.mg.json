@@ -1,0 +1,327 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-08-01/managementGroupDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "Deploy CrowdStrike Falcon Azure Policy at management group scope with automated VM extension deployment"
+  },
+  "parameters": {
+    "managementGroupId": {
+      "type": "string",
+      "defaultValue": "[managementGroup().id]",
+      "metadata": {
+        "description": "Management group ID for policy assignment scope"
+      }
+    },
+    "operatingSystem": {
+      "type": "string",
+      "defaultValue": "both",
+      "allowedValues": [
+        "linux",
+        "windows",
+        "both"
+      ],
+      "metadata": {
+        "description": "Operating systems to deploy policies for"
+      }
+    },
+    "policyDefinitionNamePrefix": {
+      "type": "string",
+      "defaultValue": "CS-Falcon-Policy",
+      "metadata": {
+        "description": "Policy definition name prefix"
+      }
+    },
+    "policyEffect": {
+      "type": "string",
+      "defaultValue": "DeployIfNotExists",
+      "allowedValues": [
+        "DeployIfNotExists",
+        "AuditIfNotExists",
+        "Disabled"
+      ],
+      "metadata": {
+        "description": "Effect for the policy assignment (DeployIfNotExists, AuditIfNotExists, Disabled)"
+      }
+    },
+    "createRoleAssignments": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Create role assignments for policy managed identities (requires Owner or User Access Administrator role)"
+      }
+    },
+    "deployToArc": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Deploy to Azure Arc-connected servers"
+      }
+    },
+    "extensionSettings": {
+      "type": "object",
+      "defaultValue": {
+        "handlerVersion": "0.0",
+        "autoUpgradeMinorVersion": true
+      },
+      "metadata": {
+        "description": "Extension configuration settings"
+      }
+    },
+    "clientId": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "CrowdStrike API Client ID"
+      }
+    },
+    "clientSecret": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "CrowdStrike API Client Secret"
+      }
+    },
+    "accessToken": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "CrowdStrike API Access Token"
+      }
+    },
+    "azureVaultName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Azure Key Vault name containing CrowdStrike credentials"
+      }
+    },
+    "cloud": {
+      "type": "string",
+      "defaultValue": "autodiscover",
+      "metadata": {
+        "description": "CrowdStrike cloud region (e.g. us-1, us-2, eu-1, us-gov-1, autodiscover)"
+      }
+    },
+    "memberCid": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Member CID for MSSP Parent/child scenarios. Requires Parent API Credentials and the Child CID."
+      }
+    },
+    "sensorUpdatePolicy": {
+      "type": "string",
+      "defaultValue": "platform_default",
+      "metadata": {
+        "description": "Sensor update policy name. Configure this to match your organization's desired sensor update policy instead of using the pre-defined default."
+      }
+    },
+    "disableProxy": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Disable proxy settings"
+      }
+    },
+    "provisioningToken": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Installation token (if required by your environment)"
+      }
+    },
+    "azureManagedIdentityClientId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Azure Managed Identity Client ID for Key Vault access (used with azureVaultName)"
+      }
+    },
+    "azureManagedIdentityResourceId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Full ARM resource ID of the user-assigned managed identity to attach to VMs/VMSS for Key Vault access"
+      }
+    },
+    "proxySettings": {
+      "type": "object",
+      "defaultValue": {
+        "proxyHost": "",
+        "proxyPort": ""
+      },
+      "metadata": {
+        "description": "Network proxy configuration settings"
+      }
+    },
+    "tags": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Comma-separated list of sensor tags"
+      }
+    },
+    "pacUrl": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Proxy auto-configuration URL (Windows-specific)"
+      }
+    },
+    "disableProvisioningWait": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Disable provisioning wait timeout (Windows-specific)"
+      }
+    },
+    "disableStart": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Prevent sensor from starting until reboot (Windows-specific)"
+      }
+    },
+    "provisioningWaitTime": {
+      "type": "string",
+      "defaultValue": "1200000",
+      "metadata": {
+        "description": "Provisioning timeout in milliseconds (Windows-specific)"
+      }
+    },
+    "vdi": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enable virtual desktop infrastructure mode (Windows-specific)"
+      }
+    },
+    "enforcementMode": {
+      "type": "string",
+      "defaultValue": "Default",
+      "allowedValues": [
+        "Default",
+        "DoNotEnforce"
+      ],
+      "metadata": {
+        "description": "The policy assignment enforcement mode"
+      }
+    },
+    "notScopes": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Array of resource IDs to exclude from policy assignment"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[deployment().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    }
+  },
+  "variables": {
+    "bicepTemplate": "[uri(deployment().properties.templateLink.uri, '../policy/falcon-managementgroup.bicep')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "falcon-policy-deployment",
+      "location": "[parameters('location')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('bicepTemplate')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "operatingSystem": {
+            "value": "[parameters('operatingSystem')]"
+          },
+          "policyDefinitionNamePrefix": {
+            "value": "[parameters('policyDefinitionNamePrefix')]"
+          },
+          "policyEffect": {
+            "value": "[parameters('policyEffect')]"
+          },
+          "createRoleAssignments": {
+            "value": "[parameters('createRoleAssignments')]"
+          },
+          "deployToArc": {
+            "value": "[parameters('deployToArc')]"
+          },
+          "extensionSettings": {
+            "value": "[parameters('extensionSettings')]"
+          },
+          "clientId": {
+            "value": "[parameters('clientId')]"
+          },
+          "clientSecret": {
+            "value": "[parameters('clientSecret')]"
+          },
+          "accessToken": {
+            "value": "[parameters('accessToken')]"
+          },
+          "azureVaultName": {
+            "value": "[parameters('azureVaultName')]"
+          },
+          "cloud": {
+            "value": "[parameters('cloud')]"
+          },
+          "memberCid": {
+            "value": "[parameters('memberCid')]"
+          },
+          "sensorUpdatePolicy": {
+            "value": "[parameters('sensorUpdatePolicy')]"
+          },
+          "disableProxy": {
+            "value": "[parameters('disableProxy')]"
+          },
+          "provisioningToken": {
+            "value": "[parameters('provisioningToken')]"
+          },
+          "azureManagedIdentityClientId": {
+            "value": "[parameters('azureManagedIdentityClientId')]"
+          },
+          "azureManagedIdentityResourceId": {
+            "value": "[parameters('azureManagedIdentityResourceId')]"
+          },
+          "proxySettings": {
+            "value": "[parameters('proxySettings')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          },
+          "pacUrl": {
+            "value": "[parameters('pacUrl')]"
+          },
+          "disableProvisioningWait": {
+            "value": "[parameters('disableProvisioningWait')]"
+          },
+          "disableStart": {
+            "value": "[parameters('disableStart')]"
+          },
+          "provisioningWaitTime": {
+            "value": "[parameters('provisioningWaitTime')]"
+          },
+          "vdi": {
+            "value": "[parameters('vdi')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "deploymentId": {
+      "type": "string",
+      "value": "[reference('falcon-policy-deployment').correlationId]"
+    },
+    "policyAssignmentIds": {
+      "type": "object",
+      "value": "[reference('falcon-policy-deployment').outputs]"
+    }
+  }
+}

@@ -1,6 +1,12 @@
 # CrowdStrike Azure VM Extension
 
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCrowdStrike%2Fazure-vm-extension%2Fmain%2Fdeploy%2FmainTemplate.sub.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FCrowdStrike%2Fazure-vm-extension%2Fmain%2Fdeploy%2FcreateUiDefinition.json)
+
 The CrowdStrike Azure VM Extension is an open-source solution that simplifies and automates the installation of the CrowdStrike Falcon sensor on Azure virtual machines at enterprise scale.
+
+## Quick Start with Azure Policy
+
+For automated enterprise-scale deployment using Azure Policy, use the **Deploy to Azure** button above or visit the [deployment guide](deploy/) for subscription and management group deployment options with guided setup.
 
 ## Overview
 
