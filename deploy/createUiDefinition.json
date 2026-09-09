@@ -29,28 +29,7 @@
         }
       }
     },
-    "basics": [
-      {
-        "name": "deploymentScope",
-        "type": "Microsoft.Common.DropDown",
-        "label": "Deployment scope",
-        "defaultValue": "Current subscription",
-        "toolTip": "Choose the scope for policy deployment. Subscription scope covers all VMs in this subscription. Management group scope can cover multiple subscriptions.",
-        "constraints": {
-          "allowedValues": [
-            {
-              "label": "Current subscription",
-              "value": "subscription"
-            },
-            {
-              "label": "Management group",
-              "value": "managementgroup"
-            }
-          ]
-        },
-        "visible": false
-      }
-    ],
+    "basics": [],
     "steps": [
       {
         "name": "falconConfig",
@@ -266,7 +245,8 @@
             "name": "deployToArc",
             "type": "Microsoft.Common.CheckBox",
             "label": "Deploy to Azure Arc servers",
-            "toolTip": "Include policies for Azure Arc-connected servers in addition to Azure VMs and VMSS"
+            "toolTip": "Include policies for Azure Arc-connected servers in addition to Azure VMs and VMSS",
+            "defaultValue": true
           },
           {
             "name": "policyEffect",
@@ -314,7 +294,8 @@
             "name": "createRoleAssignments",
             "type": "Microsoft.Common.CheckBox",
             "label": "Automatically create role assignments",
-            "toolTip": "Automatically assign required permissions to policy managed identities. Disable if you lack Owner/User Access Administrator permissions and will assign roles manually."
+            "toolTip": "Automatically assign required permissions to policy managed identities. Disable if you lack Owner/User Access Administrator permissions and will assign roles manually.",
+            "defaultValue": true
           }
         ]
       },
