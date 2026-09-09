@@ -396,8 +396,7 @@
         "disableProvisioningWait": false,
         "disableStart": false,
         "provisioningWaitTime": "1200000",
-        "vdi": false,
-        "location": "[steps('basics').location]"
+        "vdi": false
       }
     }
   }

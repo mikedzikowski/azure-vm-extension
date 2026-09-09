@@ -23,9 +23,6 @@
         },
         "resourceGroup": {
           "allowExisting": true
-        },
-        "location": {
-          "visible": false
         }
       }
     },
@@ -426,8 +423,7 @@
       "disableProvisioningWait": false,
       "disableStart": false,
       "provisioningWaitTime": "1200000",
-      "vdi": false,
-      "location": "[location()]"
+      "vdi": false
     }
   }
 }
