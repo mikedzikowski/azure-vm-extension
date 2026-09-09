@@ -199,16 +199,22 @@
                 "defaultValue": "platform_default",
                 "toolTip": "Sensor update policy name from your CrowdStrike console. Change this to match your organization's policy instead of using the default.",
                 "constraints": {
-                  "required": true
+                  "required": true,
+                  "regex": "^[-_a-zA-Z0-9 ]{1,128}$",
+                  "validationMessage": "Enter a valid sensor update policy name (letters, numbers, spaces, hyphens, underscores; max 128 characters)."
                 }
               },
               {
                 "name": "tags",
                 "type": "Microsoft.Common.TextBox",
                 "label": "Sensor Tags",
-                "defaultValue": "",
                 "toolTip": "Comma-separated list of tags to apply to sensors (e.g., 'azure,production,policy-deployed')",
-                "placeholder": "azure,production,policy-deployed"
+                "placeholder": "azure,production,policy-deployed",
+                "constraints": {
+                  "required": false,
+                  "regex": "^$|^[-_a-zA-Z0-9]+(,[-_a-zA-Z0-9]+)*$",
+                  "validationMessage": "Enter a comma-separated list of tags (letters, numbers, hyphens, underscores) with no spaces, or leave empty."
+                }
               }
             ]
           }
@@ -272,25 +278,6 @@
             }
           },
           {
-            "name": "enforcementMode",
-            "type": "Microsoft.Common.DropDown",
-            "label": "Enforcement Mode",
-            "defaultValue": "Default",
-            "toolTip": "Default enforces the policy immediately. DoNotEnforce creates the assignment but doesn't enforce compliance until you change it later.",
-            "constraints": {
-              "allowedValues": [
-                {
-                  "label": "Default (Enforce immediately)",
-                  "value": "Default"
-                },
-                {
-                  "label": "DoNotEnforce",
-                  "value": "DoNotEnforce"
-                }
-              ]
-            }
-          },
-          {
             "name": "createRoleAssignments",
             "type": "Microsoft.Common.CheckBox",
             "label": "Automatically create role assignments",
@@ -307,9 +294,13 @@
             "name": "memberCid",
             "type": "Microsoft.Common.TextBox",
             "label": "Member CID (MSSP)",
-            "defaultValue": "",
             "toolTip": "For MSSP scenarios: specify the child CID when using parent API credentials",
-            "placeholder": "Leave empty unless using MSSP parent/child setup"
+            "placeholder": "Leave empty unless using MSSP parent/child setup",
+            "constraints": {
+              "required": false,
+              "regex": "^$|^[a-fA-F0-9]{32}(-[a-fA-F0-9]{2})?$",
+              "validationMessage": "Enter a valid 32-character hexadecimal CID (optionally with a 2-character checksum suffix), or leave empty."
+            }
           },
           {
             "name": "provisioningToken",
@@ -319,6 +310,11 @@
               "confirmPassword": "Confirm Provisioning Token"
             },
             "toolTip": "Installation token for Linux sensors (if required by your environment)",
+            "constraints": {
+              "required": false,
+              "regex": "^$|^[a-fA-F0-9]{8}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{12}$",
+              "validationMessage": "Enter a valid provisioning token (GUID format), or leave empty."
+            },
             "options": {
               "hideConfirmation": false
             }
@@ -333,7 +329,12 @@
                 "type": "Microsoft.Common.TextBox",
                 "label": "Proxy Host",
                 "toolTip": "HTTP proxy hostname or IP address",
-                "placeholder": "proxy.company.com"
+                "placeholder": "proxy.company.com",
+                "constraints": {
+                  "required": false,
+                  "regex": "^$|^[a-zA-Z0-9.-]{1,253}$",
+                  "validationMessage": "Enter a valid hostname or IP address, or leave empty."
+                }
               },
               {
                 "name": "proxyPort",
@@ -342,6 +343,7 @@
                 "toolTip": "HTTP proxy port number",
                 "placeholder": "8080",
                 "constraints": {
+                  "required": false,
                   "regex": "^$|^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$",
                   "validationMessage": "Must be a valid port number (1-65535) or empty"
                 }
@@ -351,7 +353,12 @@
                 "type": "Microsoft.Common.TextBox",
                 "label": "PAC URL (Windows)",
                 "toolTip": "Proxy auto-configuration URL for Windows sensors",
-                "placeholder": "http://proxy.company.com/proxy.pac"
+                "placeholder": "http://proxy.company.com/proxy.pac",
+                "constraints": {
+                  "required": false,
+                  "regex": "^$|^https?://[-a-zA-Z0-9@:%._\\+~#=/?&]{1,2000}$",
+                  "validationMessage": "Enter a valid http(s) URL, or leave empty."
+                }
               }
             ]
           }
@@ -377,8 +384,6 @@
       "sensorUpdatePolicy": "[steps('falconConfig').basicSettings.sensorUpdatePolicy]",
       "disableProxy": false,
       "provisioningToken": "[steps('advancedOptions').provisioningToken]",
-      "azureManagedIdentityClientId": "",
-      "azureManagedIdentityResourceId": "",
       "proxySettings": {
         "proxyHost": "[steps('advancedOptions').proxyConfiguration.proxyHost]",
         "proxyPort": "[steps('advancedOptions').proxyConfiguration.proxyPort]"
@@ -389,8 +394,6 @@
       "disableStart": false,
       "provisioningWaitTime": "1200000",
       "vdi": false,
-      "enforcementMode": "[steps('deploymentOptions').enforcementMode]",
-      "notScopes": [],
       "location": "[location()]"
     }
   }
