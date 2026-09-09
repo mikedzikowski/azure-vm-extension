@@ -132,7 +132,39 @@
             "label": "Azure Key Vault Configuration",
             "elements": [
               {
-                "name": "azureVaultName",
+                "name": "getVaults",
+                "type": "Microsoft.Solutions.ArmApiControl",
+                "request": {
+                  "method": "GET",
+                  "path": "[concat(subscription().id, '/providers/Microsoft.KeyVault/vaults?api-version=2023-07-01')]"
+                }
+              },
+              {
+                "name": "vaultSelectionMode",
+                "type": "Microsoft.Common.OptionsGroup",
+                "label": "Key Vault source",
+                "defaultValue": "Select existing vault",
+                "toolTip": "Choose an existing Key Vault in the selected subscription, or enter a vault name manually.",
+                "constraints": {
+                  "allowedValues": [
+                    { "label": "Select existing vault", "value": "existing" },
+                    { "label": "Enter vault name", "value": "manual" }
+                  ]
+                }
+              },
+              {
+                "name": "existingVault",
+                "type": "Microsoft.Common.DropDown",
+                "label": "Key Vault",
+                "toolTip": "Select an existing Key Vault in the chosen subscription that holds your FALCON- prefixed secrets.",
+                "constraints": {
+                  "required": true,
+                  "allowedValues": "[map(steps('falconConfig').vaultCredentials.getVaults.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]"
+                },
+                "visible": "[equals(steps('falconConfig').vaultCredentials.vaultSelectionMode, 'existing')]"
+              },
+              {
+                "name": "manualVaultName",
                 "type": "Microsoft.Common.TextBox",
                 "label": "Key Vault Name",
                 "toolTip": "Name of the Azure Key Vault containing your CrowdStrike credentials",
@@ -141,7 +173,8 @@
                   "required": true,
                   "regex": "^[a-zA-Z0-9-]{3,24}$",
                   "validationMessage": "Vault name must be 3-24 characters, letters, numbers, and hyphens only"
-                }
+                },
+                "visible": "[equals(steps('falconConfig').vaultCredentials.vaultSelectionMode, 'manual')]"
               },
               {
                 "name": "managedIdentityInfo",
@@ -378,7 +411,7 @@
       "clientId": "[if(equals(steps('falconConfig').authenticationMethod, 'oauth2'), steps('falconConfig').oauth2Credentials.clientId, '')]",
       "clientSecret": "[if(equals(steps('falconConfig').authenticationMethod, 'oauth2'), steps('falconConfig').oauth2Credentials.clientSecret, '')]",
       "accessToken": "[if(equals(steps('falconConfig').authenticationMethod, 'token'), steps('falconConfig').tokenCredentials.accessToken, '')]",
-      "azureVaultName": "[if(equals(steps('falconConfig').authenticationMethod, 'vault'), steps('falconConfig').vaultCredentials.azureVaultName, '')]",
+      "azureVaultName": "[if(equals(steps('falconConfig').authenticationMethod, 'vault'), if(equals(steps('falconConfig').vaultCredentials.vaultSelectionMode, 'existing'), steps('falconConfig').vaultCredentials.existingVault, steps('falconConfig').vaultCredentials.manualVaultName), '')]",
       "cloud": "[steps('falconConfig').basicSettings.cloud]",
       "memberCid": "[steps('advancedOptions').memberCid]",
       "sensorUpdatePolicy": "[steps('falconConfig').basicSettings.sensorUpdatePolicy]",
