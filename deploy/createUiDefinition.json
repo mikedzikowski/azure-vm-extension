@@ -5,7 +5,7 @@
   "parameters": {
     "config": {
       "basics": {
-        "description": "Deploy **CrowdStrike Falcon Azure Policy** to automatically install the Falcon sensor on Azure VMs, VM Scale Sets, and Arc-connected servers in the selected subscription. Provide your CrowdStrike API credentials below — all other settings use sensible defaults (DeployIfNotExists, both OSes, role assignments created automatically). For details, see the [CrowdStrike Azure VM Extension documentation](https://github.com/CrowdStrike/azure-vm-extension/tree/main/deploy).",
+        "description": "Deploy **CrowdStrike Falcon Azure Policy** to automatically install the Falcon sensor on Azure VMs, VM Scale Sets, and Arc-connected servers in the selected subscription. Provide your CrowdStrike API credentials below — all other settings use sensible defaults (DeployIfNotExists, both OSes, role assignments created automatically). For details, see the [CrowdStrike Azure VM Extension documentation](https://github.com/CrowdStrike/azure-vm-extension/tree/main).",
         "resourceGroup": {
           "allowExisting": true
         }

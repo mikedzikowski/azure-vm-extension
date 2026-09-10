@@ -16,7 +16,7 @@
               "options": {
                 "icon": "Info",
                 "text": "Deploys the CrowdStrike Falcon Azure Policy at the selected management group scope. Provide your CrowdStrike API credentials below — all other settings use sensible defaults (DeployIfNotExists, both OSes, role assignments created automatically).",
-                "uri": "https://github.com/CrowdStrike/azure-vm-extension/tree/main/deploy"
+                "uri": "https://github.com/CrowdStrike/azure-vm-extension/tree/main"
               }
             },
             {
