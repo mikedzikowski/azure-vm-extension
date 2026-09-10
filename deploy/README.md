@@ -8,15 +8,15 @@ Deploy CrowdStrike Falcon Azure Policy to automatically install and configure th
 
 Deploy policies at subscription scope to cover all VMs and VMSS in a single subscription:
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCrowdStrike%2Fazure-vm-extension%2Fmain%2Fdeploy%2FmainTemplate.sub.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FCrowdStrike%2Fazure-vm-extension%2Fmain%2Fdeploy%2FcreateUiDefinition.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fazure-vm-extension%2Fdemo-deploy-to-azure-button%2Fdeploy%2FmainTemplate.sub.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fazure-vm-extension%2Fdemo-deploy-to-azure-button%2Fdeploy%2FcreateUiDefinition.json)
 
-[![Deploy to Azure](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCrowdStrike%2Fazure-vm-extension%2Fmain%2Fdeploy%2FmainTemplate.sub.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FCrowdStrike%2Fazure-vm-extension%2Fmain%2Fdeploy%2FcreateUiDefinition.json)
+[![Deploy to Azure](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fazure-vm-extension%2Fdemo-deploy-to-azure-button%2Fdeploy%2FmainTemplate.sub.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fazure-vm-extension%2Fdemo-deploy-to-azure-button%2Fdeploy%2FcreateUiDefinition.json)
 
 ### Management Group Deployment
 
 Deploy policies at management group scope for enterprise-wide deployment across multiple subscriptions. This uses the Azure portal's **CustomDeploymentBlade** route with a Form view (`uiFormDefinition.mg.json`) so the wizard can present a management group picker (including the tenant root group) — the same mechanism the [Azure Landing Zones accelerator](https://azure.github.io/Azure-Landing-Zones/accelerator/) uses to target management group scope.
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCrowdStrike%2Fazure-vm-extension%2Fmain%2Fdeploy%2FmainTemplate.mg.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FCrowdStrike%2Fazure-vm-extension%2Fmain%2Fdeploy%2FuiFormDefinition.mg.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fazure-vm-extension%2Fdemo-deploy-to-azure-button%2Fdeploy%2FmainTemplate.mg.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fazure-vm-extension%2Fdemo-deploy-to-azure-button%2Fdeploy%2FuiFormDefinition.mg.json)
 
 ### Testing from a fork (pre-merge)
 
