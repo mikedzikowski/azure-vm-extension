@@ -18,15 +18,13 @@ Deploy policies at management group scope for enterprise-wide deployment across 
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCrowdStrike%2Fazure-vm-extension%2Fmain%2Fdeploy%2FmainTemplate.mg.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FCrowdStrike%2Fazure-vm-extension%2Fmain%2Fdeploy%2FuiFormDefinition.mg.json)
 
-### Testing Buttons (Pre-merge)
+### Testing from a fork (pre-merge)
 
-For testing before the pull request is merged, use your fork:
+The buttons above resolve against `CrowdStrike/azure-vm-extension@main` and only work once this change is merged. To test from a fork or branch beforehand, take a button URL and replace the `CrowdStrike/azure-vm-extension/main` path segment with `<your-org>/azure-vm-extension/<your-branch>`, keeping the URL encoding intact. For example, the subscription template segment becomes:
 
-**Subscription Deployment:**
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fazure-vm-extension%2Ffeat%2Fdeploy-to-azure-button%2Fdeploy%2FmainTemplate.sub.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fazure-vm-extension%2Ffeat%2Fdeploy-to-azure-button%2Fdeploy%2FcreateUiDefinition.json)
-
-**Management Group Deployment:**
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fazure-vm-extension%2Ffeat%2Fdeploy-to-azure-button%2Fdeploy%2FmainTemplate.mg.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fazure-vm-extension%2Ffeat%2Fdeploy-to-azure-button%2Fdeploy%2FuiFormDefinition.mg.json)
+```
+https%3A%2F%2Fraw.githubusercontent.com%2F<your-org>%2Fazure-vm-extension%2F<your-branch>%2Fdeploy%2FmainTemplate.sub.json
+```
 
 ## What This Deployment Creates
 
