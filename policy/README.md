@@ -12,7 +12,7 @@ Deploy the Falcon policy directly from the Azure portal with a guided wizard —
 | **Management group** — cover every subscription under a management group | [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fazure-vm-extension%2Fdemo-deploy-to-azure-button%2Fdeploy%2FmainTemplate.mg.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fmikedzikowski%2Fazure-vm-extension%2Fdemo-deploy-to-azure-button%2Fdeploy%2FuiFormDefinition.mg.json) |
 
 > [!NOTE]
-> These buttons resolve against the `main` branch and activate once merged. For prerequisites, RBAC, pre-merge test buttons, and the full portal walkthrough, see [`deploy/README.md`](../deploy/README.md).
+> **Demo branch** — these buttons resolve against `mikedzikowski/azure-vm-extension@demo-deploy-to-azure-button` and work now (before the upstream PR is merged). For prerequisites, RBAC, and the full portal walkthrough, see [`deploy/README.md`](../deploy/README.md).
 
 ## Contents
 
