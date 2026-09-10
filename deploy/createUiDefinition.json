@@ -83,41 +83,32 @@
             }
           },
           {
-            "name": "mode",
-            "type": "Microsoft.Common.OptionsGroup",
-            "label": "Key Vault source",
-            "defaultValue": "Select existing vault",
-            "toolTip": "Pick an existing Key Vault or type a name.",
-            "constraints": {
-              "allowedValues": [
-                { "label": "Select existing vault", "value": "existing" },
-                { "label": "Enter vault name", "value": "manual" }
-              ]
-            }
-          },
-          {
             "name": "existingVault",
             "type": "Microsoft.Common.DropDown",
             "label": "Key Vault",
-            "toolTip": "Existing Key Vault holding your FALCON- prefixed secrets.",
+            "toolTip": "Select the existing Key Vault that holds your FALCON- prefixed secrets.",
             "constraints": {
               "required": true,
               "allowedValues": "[map(basics('vault').getVaults.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]"
-            },
-            "visible": "[equals(basics('vault').mode, 'existing')]"
+            }
           },
           {
-            "name": "manualVaultName",
-            "type": "Microsoft.Common.TextBox",
-            "label": "Key Vault Name",
-            "placeholder": "my-crowdstrike-vault",
-            "toolTip": "Name of the Key Vault containing your credentials.",
+            "name": "getIdentities",
+            "type": "Microsoft.Solutions.ArmApiControl",
+            "request": {
+              "method": "GET",
+              "path": "[concat(subscription().id, '/providers/Microsoft.ManagedIdentity/userAssignedIdentities?api-version=2023-01-31')]"
+            }
+          },
+          {
+            "name": "managedIdentity",
+            "type": "Microsoft.Common.DropDown",
+            "label": "User-assigned managed identity (optional)",
+            "toolTip": "Optionally attach a user-assigned managed identity that has Key Vault access. Leave blank to use each VM/VMSS system-assigned identity (which must be granted Key Vault access separately).",
             "constraints": {
-              "required": true,
-              "regex": "^[a-zA-Z0-9-]{3,24}$",
-              "validationMessage": "Vault name must be 3-24 characters: letters, numbers, hyphens."
-            },
-            "visible": "[equals(basics('vault').mode, 'manual')]"
+              "required": false,
+              "allowedValues": "[map(basics('vault').getIdentities.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.properties.clientId, '||', item.id, '\"}')))]"
+            }
           },
           {
             "name": "info",
@@ -125,7 +116,7 @@
             "visible": true,
             "options": {
               "icon": "Info",
-              "text": "Store secrets named FALCON-CLIENT-ID, FALCON-CLIENT-SECRET (or FALCON-ACCESS-TOKEN). VMs read them using their managed identity, which must have Key Vault access.",
+              "text": "Store secrets named FALCON-CLIENT-ID, FALCON-CLIENT-SECRET (or FALCON-ACCESS-TOKEN). VMs read them using their managed identity, which must have Key Vault access (Key Vault Secrets User). If you pick a user-assigned identity above, the policy attaches it to VMs/VMSS automatically.",
               "uri": "https://learn.microsoft.com/azure/key-vault/general/assign-access-policy"
             }
           }
@@ -187,7 +178,9 @@
       "clientId": "[if(equals(basics('authenticationMethod'), 'oauth2'), basics('oauth2').clientId, '')]",
       "clientSecret": "[if(equals(basics('authenticationMethod'), 'oauth2'), basics('oauth2').clientSecret, '')]",
       "accessToken": "[if(equals(basics('authenticationMethod'), 'token'), basics('token').accessToken, '')]",
-      "azureVaultName": "[if(equals(basics('authenticationMethod'), 'vault'), if(equals(basics('vault').mode, 'existing'), basics('vault').existingVault, basics('vault').manualVaultName), '')]",
+      "azureVaultName": "[if(equals(basics('authenticationMethod'), 'vault'), basics('vault').existingVault, '')]",
+      "azureManagedIdentityClientId": "[if(and(equals(basics('authenticationMethod'), 'vault'), not(empty(basics('vault').managedIdentity))), first(split(basics('vault').managedIdentity, '||')), '')]",
+      "azureManagedIdentityResourceId": "[if(and(equals(basics('authenticationMethod'), 'vault'), not(empty(basics('vault').managedIdentity))), last(split(basics('vault').managedIdentity, '||')), '')]",
       "operatingSystem": "[basics('operatingSystem')]",
       "cloud": "[basics('cloud')]",
       "extensionSettings": {
