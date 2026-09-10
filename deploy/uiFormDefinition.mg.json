@@ -15,7 +15,7 @@
               "visible": true,
               "options": {
                 "icon": "Info",
-                "text": "This deploys the CrowdStrike Falcon Azure Policy definitions and assignments at the selected management group scope. The DeployIfNotExists policies automatically install the Falcon VM extension on Windows/Linux VMs, VMSS, and Arc-connected servers within the management group.",
+                "text": "Deploys the CrowdStrike Falcon Azure Policy at the selected management group scope. Provide your CrowdStrike API credentials below — all other settings use sensible defaults (DeployIfNotExists, both OSes, role assignments created automatically).",
                 "uri": "https://github.com/CrowdStrike/azure-vm-extension/tree/main/deploy"
               }
             },
@@ -23,7 +23,7 @@
               "name": "managementGroup",
               "type": "Microsoft.Common.ManagementGroupSelector",
               "label": "Management group",
-              "toolTip": "Select the management group where the policy definitions and assignments will be created. The caller needs Management Group Reader to list groups and Owner/User Access Administrator on the target to create assignments and role assignments.",
+              "toolTip": "The management group to create the policy definitions and assignments in (includes the tenant root group). Requires Management Group Reader to list groups.",
               "constraints": [
                 {
                   "isValid": "[not(empty(steps('basics').managementGroup.managementGroupId))]",
@@ -37,7 +37,7 @@
               "type": "Microsoft.Common.DropDown",
               "label": "Deployment location",
               "defaultValue": "East US",
-              "toolTip": "Azure region used to store the management-group deployment metadata. Required for management-group deployments.",
+              "toolTip": "Azure region used to store the management-group deployment metadata.",
               "constraints": {
                 "required": true,
                 "allowedValues": [
@@ -48,39 +48,26 @@
                   { "label": "West US 2", "value": "westus2" },
                   { "label": "West US 3", "value": "westus3" },
                   { "label": "Canada Central", "value": "canadacentral" },
-                  { "label": "Brazil South", "value": "brazilsouth" },
                   { "label": "North Europe", "value": "northeurope" },
                   { "label": "West Europe", "value": "westeurope" },
                   { "label": "UK South", "value": "uksouth" },
                   { "label": "France Central", "value": "francecentral" },
                   { "label": "Germany West Central", "value": "germanywestcentral" },
-                  { "label": "Switzerland North", "value": "switzerlandnorth" },
-                  { "label": "Norway East", "value": "norwayeast" },
                   { "label": "Sweden Central", "value": "swedencentral" },
                   { "label": "Australia East", "value": "australiaeast" },
                   { "label": "Southeast Asia", "value": "southeastasia" },
-                  { "label": "East Asia", "value": "eastasia" },
                   { "label": "Japan East", "value": "japaneast" },
-                  { "label": "Korea Central", "value": "koreacentral" },
                   { "label": "Central India", "value": "centralindia" },
-                  { "label": "UAE North", "value": "uaenorth" },
-                  { "label": "South Africa North", "value": "southafricanorth" }
+                  { "label": "UAE North", "value": "uaenorth" }
                 ]
-              },
-              "visible": true
-            }
-          ]
-        },
-        {
-          "name": "falconConfig",
-          "label": "CrowdStrike Configuration",
-          "elements": [
+              }
+            },
             {
               "name": "authenticationMethod",
               "type": "Microsoft.Common.OptionsGroup",
               "label": "Authentication Method",
               "defaultValue": "OAuth2 Credentials",
-              "toolTip": "Choose how to authenticate with the CrowdStrike Falcon Platform",
+              "toolTip": "How the Falcon sensor authenticates to the CrowdStrike API.",
               "constraints": {
                 "allowedValues": [
                   { "label": "OAuth2 Credentials", "value": "oauth2" },
@@ -90,7 +77,7 @@
               }
             },
             {
-              "name": "oauth2Credentials",
+              "name": "oauth2",
               "type": "Microsoft.Common.Section",
               "label": "OAuth2 Credentials",
               "elements": [
@@ -98,154 +85,106 @@
                   "name": "clientId",
                   "type": "Microsoft.Common.TextBox",
                   "label": "Client ID",
-                  "toolTip": "CrowdStrike API Client ID from your Falcon console",
-                  "placeholder": "Enter your CrowdStrike Client ID",
+                  "toolTip": "CrowdStrike API Client ID.",
                   "constraints": {
                     "required": true,
                     "regex": "^[a-fA-F0-9]{32}$",
-                    "validationMessage": "Client ID must be a 32-character hexadecimal string"
+                    "validationMessage": "Client ID must be a 32-character hexadecimal string."
                   }
                 },
                 {
                   "name": "clientSecret",
                   "type": "Microsoft.Common.PasswordBox",
-                  "label": {
-                    "password": "Client Secret",
-                    "confirmPassword": "Confirm Client Secret"
-                  },
-                  "toolTip": "CrowdStrike API Client Secret from your Falcon console",
-                  "constraints": {
-                    "required": true
-                  },
-                  "options": {
-                    "hideConfirmation": false
-                  }
-                },
-                {
-                  "name": "apiHelp",
-                  "type": "Microsoft.Common.InfoBox",
-                  "visible": true,
-                  "options": {
-                    "icon": "Info",
-                    "text": "Get your CrowdStrike API credentials from the Falcon console under Support > API Clients & Keys. Required permissions: Sensor Download [read], Sensor update policies [read], Installation Tokens [read] (optional), Sensor update policies [write] (optional for uninstall).",
-                    "uri": "https://falcon.crowdstrike.com/support/api-clients-and-keys"
-                  }
+                  "label": { "password": "Client Secret", "confirmPassword": "Confirm Client Secret" },
+                  "toolTip": "CrowdStrike API Client Secret.",
+                  "constraints": { "required": true },
+                  "options": { "hideConfirmation": false }
                 }
               ],
-              "visible": "[equals(steps('falconConfig').authenticationMethod, 'oauth2')]"
+              "visible": "[equals(steps('basics').authenticationMethod, 'oauth2')]"
             },
             {
-              "name": "tokenCredentials",
+              "name": "token",
               "type": "Microsoft.Common.Section",
               "label": "Access Token",
               "elements": [
                 {
                   "name": "accessToken",
                   "type": "Microsoft.Common.PasswordBox",
-                  "label": {
-                    "password": "Access Token",
-                    "confirmPassword": "Confirm Access Token"
-                  },
-                  "toolTip": "CrowdStrike API Access Token",
-                  "constraints": {
-                    "required": true
-                  },
-                  "options": {
-                    "hideConfirmation": false
-                  }
+                  "label": { "password": "Access Token", "confirmPassword": "Confirm Access Token" },
+                  "toolTip": "CrowdStrike API Access Token.",
+                  "constraints": { "required": true },
+                  "options": { "hideConfirmation": false }
                 }
               ],
-              "visible": "[equals(steps('falconConfig').authenticationMethod, 'token')]"
+              "visible": "[equals(steps('basics').authenticationMethod, 'token')]"
             },
             {
-              "name": "vaultCredentials",
+              "name": "vault",
               "type": "Microsoft.Common.Section",
-              "label": "Azure Key Vault Configuration",
+              "label": "Azure Key Vault",
               "elements": [
                 {
-                  "name": "azureVaultName",
-                  "type": "Microsoft.Common.TextBox",
-                  "label": "Key Vault Name",
-                  "toolTip": "Name of the Azure Key Vault containing your CrowdStrike credentials",
-                  "placeholder": "my-crowdstrike-vault",
-                  "constraints": {
-                    "required": true,
-                    "regex": "^[a-zA-Z0-9-]{3,24}$",
-                    "validationMessage": "Vault name must be 3-24 characters, letters, numbers, and hyphens only"
+                  "name": "vaultSubscription",
+                  "type": "Microsoft.Common.SubscriptionSelector",
+                  "label": "Vault subscription",
+                  "toolTip": "Subscription that contains the Key Vault (needed to list vaults at management-group scope)."
+                },
+                {
+                  "name": "getVaults",
+                  "type": "Microsoft.Solutions.ArmApiControl",
+                  "request": {
+                    "method": "GET",
+                    "path": "[concat('/subscriptions/', steps('basics').vault.vaultSubscription.subscriptionId, '/providers/Microsoft.KeyVault/vaults?api-version=2023-07-01')]"
                   }
                 },
                 {
-                  "name": "managedIdentityInfo",
+                  "name": "existingVault",
+                  "type": "Microsoft.Common.DropDown",
+                  "label": "Key Vault",
+                  "toolTip": "Select the existing Key Vault that holds your FALCON- prefixed secrets.",
+                  "constraints": {
+                    "required": true,
+                    "allowedValues": "[map(steps('basics').vault.getVaults.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]"
+                  }
+                },
+                {
+                  "name": "getIdentities",
+                  "type": "Microsoft.Solutions.ArmApiControl",
+                  "request": {
+                    "method": "GET",
+                    "path": "[concat('/subscriptions/', steps('basics').vault.vaultSubscription.subscriptionId, '/providers/Microsoft.ManagedIdentity/userAssignedIdentities?api-version=2023-01-31')]"
+                  }
+                },
+                {
+                  "name": "managedIdentity",
+                  "type": "Microsoft.Common.DropDown",
+                  "label": "User-assigned managed identity (optional)",
+                  "toolTip": "Optionally attach a user-assigned managed identity that has Key Vault access. Leave blank to use each VM/VMSS system-assigned identity.",
+                  "constraints": {
+                    "required": false,
+                    "allowedValues": "[map(steps('basics').vault.getIdentities.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.properties.clientId, '||', item.id, '\"}')))]"
+                  }
+                },
+                {
+                  "name": "info",
                   "type": "Microsoft.Common.InfoBox",
                   "visible": true,
                   "options": {
                     "icon": "Info",
-                    "text": "Store secrets in your Key Vault with these names: FALCON-CLIENT-ID, FALCON-CLIENT-SECRET, FALCON-ACCESS-TOKEN. VMs will use their managed identity to retrieve credentials. Ensure VMs have Key Vault access permissions.",
+                    "text": "Store secrets named FALCON-CLIENT-ID, FALCON-CLIENT-SECRET (or FALCON-ACCESS-TOKEN). VMs read them using their managed identity, which must have Key Vault access (Key Vault Secrets User).",
                     "uri": "https://learn.microsoft.com/azure/key-vault/general/assign-access-policy"
                   }
                 }
               ],
-              "visible": "[equals(steps('falconConfig').authenticationMethod, 'vault')]"
+              "visible": "[equals(steps('basics').authenticationMethod, 'vault')]"
             },
-            {
-              "name": "basicSettings",
-              "type": "Microsoft.Common.Section",
-              "label": "Basic Settings",
-              "elements": [
-                {
-                  "name": "cloud",
-                  "type": "Microsoft.Common.DropDown",
-                  "label": "CrowdStrike Cloud",
-                  "defaultValue": "Auto-discover",
-                  "toolTip": "CrowdStrike cloud region for your environment",
-                  "constraints": {
-                    "allowedValues": [
-                      { "label": "Auto-discover", "value": "autodiscover" },
-                      { "label": "US-1", "value": "us-1" },
-                      { "label": "US-2", "value": "us-2" },
-                      { "label": "EU-1", "value": "eu-1" },
-                      { "label": "US-GOV-1", "value": "us-gov-1" }
-                    ]
-                  }
-                },
-                {
-                  "name": "sensorUpdatePolicy",
-                  "type": "Microsoft.Common.TextBox",
-                  "label": "Sensor Update Policy",
-                  "defaultValue": "platform_default",
-                  "toolTip": "Sensor update policy name from your CrowdStrike console. Change this to match your organization's policy instead of using the default.",
-                  "constraints": {
-                    "required": true,
-                    "regex": "^[-_a-zA-Z0-9 ]{1,128}$",
-                    "validationMessage": "Enter a valid sensor update policy name (letters, numbers, spaces, hyphens, underscores; max 128 characters)."
-                  }
-                },
-                {
-                  "name": "tags",
-                  "type": "Microsoft.Common.TextBox",
-                  "label": "Sensor Tags",
-                  "toolTip": "Comma-separated list of tags to apply to sensors (e.g., 'azure,production,policy-deployed')",
-                  "placeholder": "azure,production,policy-deployed",
-                  "constraints": {
-                    "required": false,
-                    "regex": "^$|^[-_a-zA-Z0-9]+(,[-_a-zA-Z0-9]+)*$",
-                    "validationMessage": "Enter a comma-separated list of tags (letters, numbers, hyphens, underscores) with no spaces, or leave empty."
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "deploymentOptions",
-          "label": "Deployment Options",
-          "elements": [
             {
               "name": "operatingSystem",
               "type": "Microsoft.Common.DropDown",
-              "label": "Operating Systems",
+              "label": "Operating systems",
               "defaultValue": "Both Linux and Windows",
-              "toolTip": "Select which operating systems to deploy policies for",
+              "toolTip": "Which operating systems to target.",
               "constraints": {
                 "allowedValues": [
                   { "label": "Both Linux and Windows", "value": "both" },
@@ -255,110 +194,39 @@
               }
             },
             {
-              "name": "deployToArc",
-              "type": "Microsoft.Common.CheckBox",
-              "label": "Deploy to Azure Arc servers",
-              "toolTip": "Include policies for Azure Arc-connected servers in addition to Azure VMs and VMSS",
-              "defaultValue": true
-            },
-            {
-              "name": "policyEffect",
+              "name": "cloud",
               "type": "Microsoft.Common.DropDown",
-              "label": "Policy Effect",
-              "defaultValue": "DeployIfNotExists",
-              "toolTip": "Choose the policy behavior: DeployIfNotExists automatically installs sensors, AuditIfNotExists only reports compliance, Disabled turns off the policy",
+              "label": "CrowdStrike cloud",
+              "defaultValue": "Auto-discover",
+              "toolTip": "CrowdStrike cloud region.",
               "constraints": {
                 "allowedValues": [
-                  { "label": "DeployIfNotExists (Recommended)", "value": "DeployIfNotExists" },
-                  { "label": "AuditIfNotExists", "value": "AuditIfNotExists" },
-                  { "label": "Disabled", "value": "Disabled" }
+                  { "label": "Auto-discover", "value": "autodiscover" },
+                  { "label": "US-1", "value": "us-1" },
+                  { "label": "US-2", "value": "us-2" },
+                  { "label": "EU-1", "value": "eu-1" },
+                  { "label": "US-GOV-1", "value": "us-gov-1" }
                 ]
               }
             },
             {
-              "name": "createRoleAssignments",
-              "type": "Microsoft.Common.CheckBox",
-              "label": "Automatically create role assignments",
-              "toolTip": "Automatically assign required permissions to policy managed identities. Disable if you lack Owner/User Access Administrator permissions and will assign roles manually.",
-              "defaultValue": true
-            }
-          ]
-        },
-        {
-          "name": "advancedOptions",
-          "label": "Advanced Options",
-          "elements": [
-            {
-              "name": "memberCid",
-              "type": "Microsoft.Common.TextBox",
-              "label": "Member CID (MSSP)",
-              "toolTip": "For MSSP scenarios: specify the child CID when using parent API credentials",
-              "placeholder": "Leave empty unless using MSSP parent/child setup",
+              "name": "extensionVersion",
+              "type": "Microsoft.Common.DropDown",
+              "label": "Sensor extension version",
+              "defaultValue": "1.7",
+              "toolTip": "CrowdStrike Falcon VM extension handler version to install (major.minor). Minor versions upgrade automatically.",
               "constraints": {
-                "required": false,
-                "regex": "^$|^[a-fA-F0-9]{32}(-[a-fA-F0-9]{2})?$",
-                "validationMessage": "Enter a valid 32-character hexadecimal CID (optionally with a 2-character checksum suffix), or leave empty."
+                "required": true,
+                "allowedValues": [
+                  { "label": "1.7 (latest)", "value": "1.7" },
+                  { "label": "1.6", "value": "1.6" },
+                  { "label": "1.5", "value": "1.5" },
+                  { "label": "1.3", "value": "1.3" },
+                  { "label": "1.2", "value": "1.2" },
+                  { "label": "1.1", "value": "1.1" },
+                  { "label": "1.0", "value": "1.0" }
+                ]
               }
-            },
-            {
-              "name": "provisioningToken",
-              "type": "Microsoft.Common.PasswordBox",
-              "label": {
-                "password": "Provisioning Token (Linux)",
-                "confirmPassword": "Confirm Provisioning Token"
-              },
-              "toolTip": "Installation token for Linux sensors (if required by your environment)",
-              "constraints": {
-                "required": false,
-                "regex": "^$|^[a-fA-F0-9]{8}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{4}-?[a-fA-F0-9]{12}$",
-                "validationMessage": "Enter a valid provisioning token (GUID format), or leave empty."
-              },
-              "options": {
-                "hideConfirmation": false
-              }
-            },
-            {
-              "name": "proxyConfiguration",
-              "type": "Microsoft.Common.Section",
-              "label": "Proxy Configuration",
-              "elements": [
-                {
-                  "name": "proxyHost",
-                  "type": "Microsoft.Common.TextBox",
-                  "label": "Proxy Host",
-                  "toolTip": "HTTP proxy hostname or IP address",
-                  "placeholder": "proxy.company.com",
-                  "constraints": {
-                    "required": false,
-                    "regex": "^$|^[a-zA-Z0-9.-]{1,253}$",
-                    "validationMessage": "Enter a valid hostname or IP address, or leave empty."
-                  }
-                },
-                {
-                  "name": "proxyPort",
-                  "type": "Microsoft.Common.TextBox",
-                  "label": "Proxy Port",
-                  "toolTip": "HTTP proxy port number",
-                  "placeholder": "8080",
-                  "constraints": {
-                    "required": false,
-                    "regex": "^$|^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$",
-                    "validationMessage": "Must be a valid port number (1-65535) or empty"
-                  }
-                },
-                {
-                  "name": "pacUrl",
-                  "type": "Microsoft.Common.TextBox",
-                  "label": "PAC URL (Windows)",
-                  "toolTip": "Proxy auto-configuration URL for Windows sensors",
-                  "placeholder": "http://proxy.company.com/proxy.pac",
-                  "constraints": {
-                    "required": false,
-                    "regex": "^$|^https?://[-a-zA-Z0-9@:%._\\+~#=/?&]{1,2000}$",
-                    "validationMessage": "Enter a valid http(s) URL, or leave empty."
-                  }
-                }
-              ]
             }
           ]
         }
@@ -369,34 +237,18 @@
       "managementGroupId": "[steps('basics').managementGroup.managementGroupId]",
       "location": "[steps('basics').location]",
       "parameters": {
-        "operatingSystem": "[steps('deploymentOptions').operatingSystem]",
-        "policyDefinitionNamePrefix": "CS-Falcon-Policy",
-        "policyEffect": "[steps('deploymentOptions').policyEffect]",
-        "createRoleAssignments": "[steps('deploymentOptions').createRoleAssignments]",
-        "deployToArc": "[steps('deploymentOptions').deployToArc]",
+        "operatingSystem": "[steps('basics').operatingSystem]",
+        "cloud": "[steps('basics').cloud]",
         "extensionSettings": {
-          "handlerVersion": "0.0",
+          "handlerVersion": "[steps('basics').extensionVersion]",
           "autoUpgradeMinorVersion": true
         },
-        "clientId": "[if(equals(steps('falconConfig').authenticationMethod, 'oauth2'), steps('falconConfig').oauth2Credentials.clientId, '')]",
-        "clientSecret": "[if(equals(steps('falconConfig').authenticationMethod, 'oauth2'), steps('falconConfig').oauth2Credentials.clientSecret, '')]",
-        "accessToken": "[if(equals(steps('falconConfig').authenticationMethod, 'token'), steps('falconConfig').tokenCredentials.accessToken, '')]",
-        "azureVaultName": "[if(equals(steps('falconConfig').authenticationMethod, 'vault'), steps('falconConfig').vaultCredentials.azureVaultName, '')]",
-        "cloud": "[steps('falconConfig').basicSettings.cloud]",
-        "memberCid": "[steps('advancedOptions').memberCid]",
-        "sensorUpdatePolicy": "[steps('falconConfig').basicSettings.sensorUpdatePolicy]",
-        "disableProxy": false,
-        "provisioningToken": "[steps('advancedOptions').provisioningToken]",
-        "proxySettings": {
-          "proxyHost": "[steps('advancedOptions').proxyConfiguration.proxyHost]",
-          "proxyPort": "[steps('advancedOptions').proxyConfiguration.proxyPort]"
-        },
-        "tags": "[steps('falconConfig').basicSettings.tags]",
-        "pacUrl": "[steps('advancedOptions').proxyConfiguration.pacUrl]",
-        "disableProvisioningWait": false,
-        "disableStart": false,
-        "provisioningWaitTime": "1200000",
-        "vdi": false
+        "clientId": "[if(equals(steps('basics').authenticationMethod, 'oauth2'), steps('basics').oauth2.clientId, '')]",
+        "clientSecret": "[if(equals(steps('basics').authenticationMethod, 'oauth2'), steps('basics').oauth2.clientSecret, '')]",
+        "accessToken": "[if(equals(steps('basics').authenticationMethod, 'token'), steps('basics').token.accessToken, '')]",
+        "azureVaultName": "[if(equals(steps('basics').authenticationMethod, 'vault'), steps('basics').vault.existingVault, '')]",
+        "azureManagedIdentityClientId": "[if(and(equals(steps('basics').authenticationMethod, 'vault'), not(empty(steps('basics').vault.managedIdentity))), first(split(steps('basics').vault.managedIdentity, '||')), '')]",
+        "azureManagedIdentityResourceId": "[if(and(equals(steps('basics').authenticationMethod, 'vault'), not(empty(steps('basics').vault.managedIdentity))), last(split(steps('basics').vault.managedIdentity, '||')), '')]"
       }
     }
   }
