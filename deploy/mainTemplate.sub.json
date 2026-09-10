@@ -57,7 +57,7 @@
     "extensionSettings": {
       "type": "object",
       "defaultValue": {
-        "handlerVersion": "0.0",
+        "handlerVersion": "1.7",
         "autoUpgradeMinorVersion": true
       },
       "metadata": {
@@ -279,7 +279,7 @@
           "description": "CrowdStrike Falcon extension configuration settings"
         },
         "defaultValue": {
-          "handlerVersion": "0.0",
+          "handlerVersion": "1.7",
           "autoUpgradeMinorVersion": true
         }
       }
