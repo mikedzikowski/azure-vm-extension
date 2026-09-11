@@ -210,7 +210,7 @@
     },
     "outputs": {
       "kind": "ManagementGroup",
-      "managementGroupId": "[steps('basics').managementGroup.managementGroupId]",
+      "managementGroupId": "[concat('/providers/Microsoft.Management/managementGroups/', steps('basics').managementGroup.managementGroupId)]",
       "location": "[steps('basics').location]",
       "parameters": {
         "operatingSystem": "[steps('basics').operatingSystem]",
