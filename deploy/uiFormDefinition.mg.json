@@ -77,101 +77,83 @@
               }
             },
             {
-              "name": "oauth2",
-              "type": "Microsoft.Common.Section",
-              "label": "OAuth2 Credentials",
-              "elements": [
-                {
-                  "name": "clientId",
-                  "type": "Microsoft.Common.TextBox",
-                  "label": "Client ID",
-                  "toolTip": "CrowdStrike API Client ID.",
-                  "constraints": {
-                    "required": true,
-                    "regex": "^[a-fA-F0-9]{32}$",
-                    "validationMessage": "Client ID must be a 32-character hexadecimal string."
-                  }
-                },
-                {
-                  "name": "clientSecret",
-                  "type": "Microsoft.Common.PasswordBox",
-                  "label": { "password": "Client Secret", "confirmPassword": "Confirm Client Secret" },
-                  "toolTip": "CrowdStrike API Client Secret.",
-                  "constraints": { "required": true },
-                  "options": { "hideConfirmation": false }
-                }
-              ],
+              "name": "clientId",
+              "type": "Microsoft.Common.TextBox",
+              "label": "Client ID",
+              "toolTip": "CrowdStrike API Client ID.",
+              "constraints": {
+                "required": true,
+                "regex": "^[a-fA-F0-9]{32}$",
+                "validationMessage": "Client ID must be a 32-character hexadecimal string."
+              },
               "visible": "[equals(steps('basics').authenticationMethod, 'oauth2')]"
             },
             {
-              "name": "token",
-              "type": "Microsoft.Common.Section",
-              "label": "Access Token",
-              "elements": [
-                {
-                  "name": "accessToken",
-                  "type": "Microsoft.Common.PasswordBox",
-                  "label": { "password": "Access Token", "confirmPassword": "Confirm Access Token" },
-                  "toolTip": "CrowdStrike API Access Token.",
-                  "constraints": { "required": true },
-                  "options": { "hideConfirmation": false }
-                }
-              ],
+              "name": "clientSecret",
+              "type": "Microsoft.Common.PasswordBox",
+              "label": { "password": "Client Secret", "confirmPassword": "Confirm Client Secret" },
+              "toolTip": "CrowdStrike API Client Secret.",
+              "constraints": { "required": true },
+              "options": { "hideConfirmation": false },
+              "visible": "[equals(steps('basics').authenticationMethod, 'oauth2')]"
+            },
+            {
+              "name": "accessToken",
+              "type": "Microsoft.Common.PasswordBox",
+              "label": { "password": "Access Token", "confirmPassword": "Confirm Access Token" },
+              "toolTip": "CrowdStrike API Access Token.",
+              "constraints": { "required": true },
+              "options": { "hideConfirmation": false },
               "visible": "[equals(steps('basics').authenticationMethod, 'token')]"
             },
             {
-              "name": "vault",
-              "type": "Microsoft.Common.Section",
-              "label": "Azure Key Vault",
-              "elements": [
-                {
-                  "name": "azureVaultName",
-                  "type": "Microsoft.Common.TextBox",
-                  "label": "Key Vault name",
-                  "placeholder": "my-crowdstrike-vault",
-                  "toolTip": "Name of the existing Key Vault that holds your FALCON- prefixed secrets.",
-                  "constraints": {
-                    "required": true,
-                    "regex": "^[a-zA-Z0-9-]{3,24}$",
-                    "validationMessage": "Vault name must be 3-24 characters: letters, numbers, hyphens."
-                  }
-                },
-                {
-                  "name": "managedIdentityClientId",
-                  "type": "Microsoft.Common.TextBox",
-                  "label": "User-assigned identity Client ID (optional)",
-                  "placeholder": "00000000-0000-0000-0000-000000000000",
-                  "toolTip": "Client ID of a user-assigned managed identity with Key Vault access. Leave blank to use the VM/VMSS system-assigned identity.",
-                  "constraints": {
-                    "required": false,
-                    "regex": "^$|^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
-                    "validationMessage": "Enter a valid GUID, or leave blank."
-                  }
-                },
-                {
-                  "name": "managedIdentityResourceId",
-                  "type": "Microsoft.Common.TextBox",
-                  "label": "User-assigned identity Resource ID (optional)",
-                  "placeholder": "/subscriptions/.../providers/Microsoft.ManagedIdentity/userAssignedIdentities/<name>",
-                  "toolTip": "Full ARM resource ID of the user-assigned managed identity to attach to VMs/VMSS (required if Client ID is set).",
-                  "constraints": {
-                    "required": false,
-                    "regex": "^$|^/subscriptions/.+/providers/Microsoft.ManagedIdentity/userAssignedIdentities/.+$",
-                    "validationMessage": "Enter a valid user-assigned identity resource ID, or leave blank."
-                  }
-                },
-                {
-                  "name": "info",
-                  "type": "Microsoft.Common.InfoBox",
-                  "visible": true,
-                  "options": {
-                    "icon": "Info",
-                    "text": "Store secrets named FALCON-CLIENT-ID, FALCON-CLIENT-SECRET (or FALCON-ACCESS-TOKEN). VMs read them using their managed identity, which must have Key Vault access (Key Vault Secrets User).",
-                    "uri": "https://learn.microsoft.com/azure/key-vault/general/assign-access-policy"
-                  }
-                }
-              ],
+              "name": "azureVaultName",
+              "type": "Microsoft.Common.TextBox",
+              "label": "Key Vault name",
+              "placeholder": "my-crowdstrike-vault",
+              "toolTip": "Name of the existing Key Vault that holds your FALCON- prefixed secrets.",
+              "constraints": {
+                "required": true,
+                "regex": "^[a-zA-Z0-9-]{3,24}$",
+                "validationMessage": "Vault name must be 3-24 characters: letters, numbers, hyphens."
+              },
               "visible": "[equals(steps('basics').authenticationMethod, 'vault')]"
+            },
+            {
+              "name": "managedIdentityClientId",
+              "type": "Microsoft.Common.TextBox",
+              "label": "User-assigned identity Client ID (optional)",
+              "placeholder": "00000000-0000-0000-0000-000000000000",
+              "toolTip": "Client ID of a user-assigned managed identity with Key Vault access. Leave blank to use the VM/VMSS system-assigned identity.",
+              "constraints": {
+                "required": false,
+                "regex": "^$|^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+                "validationMessage": "Enter a valid GUID, or leave blank."
+              },
+              "visible": "[equals(steps('basics').authenticationMethod, 'vault')]"
+            },
+            {
+              "name": "managedIdentityResourceId",
+              "type": "Microsoft.Common.TextBox",
+              "label": "User-assigned identity Resource ID (optional)",
+              "placeholder": "/subscriptions/.../providers/Microsoft.ManagedIdentity/userAssignedIdentities/<name>",
+              "toolTip": "Full ARM resource ID of the user-assigned managed identity to attach to VMs/VMSS (required if Client ID is set).",
+              "constraints": {
+                "required": false,
+                "regex": "^$|^/subscriptions/.+/providers/Microsoft.ManagedIdentity/userAssignedIdentities/.+$",
+                "validationMessage": "Enter a valid user-assigned identity resource ID, or leave blank."
+              },
+              "visible": "[equals(steps('basics').authenticationMethod, 'vault')]"
+            },
+            {
+              "name": "vaultInfo",
+              "type": "Microsoft.Common.InfoBox",
+              "visible": "[equals(steps('basics').authenticationMethod, 'vault')]",
+              "options": {
+                "icon": "Info",
+                "text": "Store secrets named FALCON-CLIENT-ID, FALCON-CLIENT-SECRET (or FALCON-ACCESS-TOKEN). VMs read them using their managed identity, which must have Key Vault access (Key Vault Secrets User).",
+                "uri": "https://learn.microsoft.com/azure/key-vault/general/assign-access-policy"
+              }
             },
             {
               "name": "operatingSystem",
@@ -237,12 +219,12 @@
           "handlerVersion": "[steps('basics').extensionVersion]",
           "autoUpgradeMinorVersion": true
         },
-        "clientId": "[if(equals(steps('basics').authenticationMethod, 'oauth2'), steps('basics').oauth2.clientId, '')]",
-        "clientSecret": "[if(equals(steps('basics').authenticationMethod, 'oauth2'), steps('basics').oauth2.clientSecret, '')]",
-        "accessToken": "[if(equals(steps('basics').authenticationMethod, 'token'), steps('basics').token.accessToken, '')]",
-        "azureVaultName": "[if(equals(steps('basics').authenticationMethod, 'vault'), steps('basics').vault.azureVaultName, '')]",
-        "azureManagedIdentityClientId": "[if(equals(steps('basics').authenticationMethod, 'vault'), steps('basics').vault.managedIdentityClientId, '')]",
-        "azureManagedIdentityResourceId": "[if(equals(steps('basics').authenticationMethod, 'vault'), steps('basics').vault.managedIdentityResourceId, '')]"
+        "clientId": "[if(equals(steps('basics').authenticationMethod, 'oauth2'), steps('basics').clientId, '')]",
+        "clientSecret": "[if(equals(steps('basics').authenticationMethod, 'oauth2'), steps('basics').clientSecret, '')]",
+        "accessToken": "[if(equals(steps('basics').authenticationMethod, 'token'), steps('basics').accessToken, '')]",
+        "azureVaultName": "[if(equals(steps('basics').authenticationMethod, 'vault'), steps('basics').azureVaultName, '')]",
+        "azureManagedIdentityClientId": "[if(equals(steps('basics').authenticationMethod, 'vault'), steps('basics').managedIdentityClientId, '')]",
+        "azureManagedIdentityResourceId": "[if(equals(steps('basics').authenticationMethod, 'vault'), steps('basics').managedIdentityResourceId, '')]"
       }
     }
   }
