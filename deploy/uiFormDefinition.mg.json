@@ -207,7 +207,7 @@
               "name": "extensionVersion",
               "type": "Microsoft.Common.DropDown",
               "label": "Sensor extension version",
-              "defaultValue": "1.7",
+              "defaultValue": "1.7 (latest)",
               "toolTip": "CrowdStrike Falcon VM extension handler version to install (major.minor). Minor versions upgrade automatically.",
               "constraints": {
                 "required": true,
