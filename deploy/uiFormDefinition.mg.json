@@ -125,45 +125,39 @@
               "label": "Azure Key Vault",
               "elements": [
                 {
-                  "name": "vaultSubscription",
-                  "type": "Microsoft.Common.SubscriptionSelector",
-                  "label": "Vault subscription",
-                  "toolTip": "Subscription that contains the Key Vault (needed to list vaults at management-group scope)."
-                },
-                {
-                  "name": "getVaults",
-                  "type": "Microsoft.Solutions.ArmApiControl",
-                  "request": {
-                    "method": "GET",
-                    "path": "[concat('/subscriptions/', steps('basics').vault.vaultSubscription.subscriptionId, '/providers/Microsoft.KeyVault/vaults?api-version=2023-07-01')]"
-                  }
-                },
-                {
-                  "name": "existingVault",
-                  "type": "Microsoft.Common.DropDown",
-                  "label": "Key Vault",
-                  "toolTip": "Select the existing Key Vault that holds your FALCON- prefixed secrets.",
+                  "name": "azureVaultName",
+                  "type": "Microsoft.Common.TextBox",
+                  "label": "Key Vault name",
+                  "placeholder": "my-crowdstrike-vault",
+                  "toolTip": "Name of the existing Key Vault that holds your FALCON- prefixed secrets.",
                   "constraints": {
                     "required": true,
-                    "allowedValues": "[map(steps('basics').vault.getVaults.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]"
+                    "regex": "^[a-zA-Z0-9-]{3,24}$",
+                    "validationMessage": "Vault name must be 3-24 characters: letters, numbers, hyphens."
                   }
                 },
                 {
-                  "name": "getIdentities",
-                  "type": "Microsoft.Solutions.ArmApiControl",
-                  "request": {
-                    "method": "GET",
-                    "path": "[concat('/subscriptions/', steps('basics').vault.vaultSubscription.subscriptionId, '/providers/Microsoft.ManagedIdentity/userAssignedIdentities?api-version=2023-01-31')]"
-                  }
-                },
-                {
-                  "name": "managedIdentity",
-                  "type": "Microsoft.Common.DropDown",
-                  "label": "User-assigned managed identity (optional)",
-                  "toolTip": "Optionally attach a user-assigned managed identity that has Key Vault access. Leave blank to use each VM/VMSS system-assigned identity.",
+                  "name": "managedIdentityClientId",
+                  "type": "Microsoft.Common.TextBox",
+                  "label": "User-assigned identity Client ID (optional)",
+                  "placeholder": "00000000-0000-0000-0000-000000000000",
+                  "toolTip": "Client ID of a user-assigned managed identity with Key Vault access. Leave blank to use the VM/VMSS system-assigned identity.",
                   "constraints": {
                     "required": false,
-                    "allowedValues": "[map(steps('basics').vault.getIdentities.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.properties.clientId, '||', item.id, '\"}')))]"
+                    "regex": "^$|^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$",
+                    "validationMessage": "Enter a valid GUID, or leave blank."
+                  }
+                },
+                {
+                  "name": "managedIdentityResourceId",
+                  "type": "Microsoft.Common.TextBox",
+                  "label": "User-assigned identity Resource ID (optional)",
+                  "placeholder": "/subscriptions/.../providers/Microsoft.ManagedIdentity/userAssignedIdentities/<name>",
+                  "toolTip": "Full ARM resource ID of the user-assigned managed identity to attach to VMs/VMSS (required if Client ID is set).",
+                  "constraints": {
+                    "required": false,
+                    "regex": "^$|^/subscriptions/.+/providers/Microsoft.ManagedIdentity/userAssignedIdentities/.+$",
+                    "validationMessage": "Enter a valid user-assigned identity resource ID, or leave blank."
                   }
                 },
                 {
@@ -246,9 +240,9 @@
         "clientId": "[if(equals(steps('basics').authenticationMethod, 'oauth2'), steps('basics').oauth2.clientId, '')]",
         "clientSecret": "[if(equals(steps('basics').authenticationMethod, 'oauth2'), steps('basics').oauth2.clientSecret, '')]",
         "accessToken": "[if(equals(steps('basics').authenticationMethod, 'token'), steps('basics').token.accessToken, '')]",
-        "azureVaultName": "[if(equals(steps('basics').authenticationMethod, 'vault'), steps('basics').vault.existingVault, '')]",
-        "azureManagedIdentityClientId": "[if(and(equals(steps('basics').authenticationMethod, 'vault'), not(empty(steps('basics').vault.managedIdentity))), first(split(steps('basics').vault.managedIdentity, '||')), '')]",
-        "azureManagedIdentityResourceId": "[if(and(equals(steps('basics').authenticationMethod, 'vault'), not(empty(steps('basics').vault.managedIdentity))), last(split(steps('basics').vault.managedIdentity, '||')), '')]"
+        "azureVaultName": "[if(equals(steps('basics').authenticationMethod, 'vault'), steps('basics').vault.azureVaultName, '')]",
+        "azureManagedIdentityClientId": "[if(equals(steps('basics').authenticationMethod, 'vault'), steps('basics').vault.managedIdentityClientId, '')]",
+        "azureManagedIdentityResourceId": "[if(equals(steps('basics').authenticationMethod, 'vault'), steps('basics').vault.managedIdentityResourceId, '')]"
       }
     }
   }
